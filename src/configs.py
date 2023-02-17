@@ -30,10 +30,11 @@ def configure_argument_parser(available_modes):
     return parser
 
 
-def configure_logging():
+def configure_logging(encoding='utf-8'):
     LOG_DIR.mkdir(exist_ok=True)
     rotating_handler = RotatingFileHandler(
-        LOG_DIR / PARSER_LOG, maxBytes=10 ** 6, backupCount=5
+        LOG_DIR / PARSER_LOG, maxBytes=10 ** 6,
+        backupCount=5, encoding=encoding
     )
     logging.basicConfig(
         datefmt=DT_FORMAT,

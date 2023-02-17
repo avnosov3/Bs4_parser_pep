@@ -1,5 +1,6 @@
+import logging
+
 from bs4 import BeautifulSoup
-from requests import RequestException
 
 from exceptions import ParserFindTagException
 
@@ -8,13 +9,13 @@ FIND_TAG_ERROR = 'Не найден тег {} {}'
 NONE_MESSAGE = 'По этому адресу "{}" не удалось получить содержимое'
 
 
-def get_response(session, url):
+def get_response(session, url, encoding='utf-8'):
     try:
         response = session.get(url)
-        response.encoding = 'utf-8'
+        response.encoding = encoding
         return response
-    except RequestException:
-        raise RequestException(
+    except ConnectionError:
+        raise ConnectionError(
             REQUEST_ERROR.format(url)
         )
 
@@ -26,5 +27,9 @@ def find_tag(soup, tag, attrs=None):
     return searched_tag
 
 
-def get_soup(session, url):
-    return BeautifulSoup(get_response(session, url).text, 'lxml')
+def get_soup(session, url, features='lxml'):
+    return BeautifulSoup(get_response(session, url).text, features)
+
+
+def get_logs(logs):
+    return [logging.exception(log) for log in logs]

@@ -9,7 +9,7 @@ from configs import configure_argument_parser, configure_logging
 from constants import (ALL_VERSIONS, BASE_DIR, DOWNLOADS, EXPECTED_STATUSES,
                        MAIN_DOC_URL, MAIN_PEP_URL)
 from outputs import control_output
-from utils import find_tag, get_soup
+from utils import find_tag, get_soup, get_logs
 
 DIFFERENT_STATUSES_MESSAGE = (
     'Несовпадающие статусы "{}". '
@@ -19,40 +19,45 @@ DIFFERENT_STATUSES_MESSAGE = (
 
 NONE_MESSAGE = 'По этому адресу "{}" не удалось получить содержимое.'
 LOOKUP_MESSAGE = 'Текст "{}" не найден в  "{}". '
-ERROR = 'Сбой в работе программы: {}'
+ERROR = 'Сбой в работе программы: {}.'
+SUCCSESS_DOWNLOAD_MESSAGE = 'Архив был загружен и сохранён: {}.'
+ARGS_MESSAGE = 'Аргументы командной строки: {}.'
+START_MESSAGE = 'Парсер запущен!'
+STOP_MESSAGE = 'Парсер завершил работу.'
+
 LOGS = []
 
 
 def pep(session):
-    soup = get_soup(session, MAIN_PEP_URL)
-    statuses = []
-    for row in tqdm(soup.select('#numerical-index tbody tr')):
+    for row in tqdm(get_soup(session, MAIN_PEP_URL).select(
+                    '#numerical-index tbody tr')):
         _, table_status = row.find('abbr')['title'].split(',')
+        table_status = table_status.strip()
         url = urljoin(MAIN_PEP_URL, row.find('a')['href'])
-        status = get_soup(session, url).find('abbr').text
-        statuses.append(status)
-        if table_status.strip() not in status:
+        try:
+            status = get_soup(session, url).find('abbr').text
+        except ConnectionError:
+            continue
+        if table_status not in status:
             LOGS.append(
                 DIFFERENT_STATUSES_MESSAGE.format(
                     url, table_status, status
                 )
             )
-    logging.exception(*LOGS)
-    return (
-        [('Статус', 'Количество')]
-        + [(pattern, statuses.count(pattern)) for pattern in EXPECTED_STATUSES]
-        + [('Общее количество', len(statuses))]
-    )
+        EXPECTED_STATUSES[table_status] += 1
+    get_logs(LOGS)
+    return [
+        ('Статус', 'Количество'),
+        *EXPECTED_STATUSES.items(),
+        ('Всего', sum(EXPECTED_STATUSES.values()))
+    ]
 
 
 def whats_new(session):
     whats_new_url = urljoin(MAIN_DOC_URL, 'whatsnew/')
-    # soup = get_soup(session, whats_new_url)
-    sections_by_python = get_soup(session, whats_new_url).select(
-        '#what-s-new-in-python div.toctree-wrapper li.toctree-l1'
-    )
     results = [('Ссылка на статью', 'Заголовок', 'Редактор, Автор')]
-    for section in tqdm(sections_by_python):
+    for section in tqdm(get_soup(session, whats_new_url).select(
+                '#what-s-new-in-python div.toctree-wrapper li.toctree-l1')):
         version_a_tag = section.find('a')
         href = version_a_tag['href']
         version_link = urljoin(whats_new_url, href)
@@ -75,7 +80,7 @@ def latest_versions(session):
             a_tags = ul.find_all('a')
             break
     else:
-        raise LookupError(LOOKUP_MESSAGE.format(ALL_VERSIONS, ul.text))
+        raise KeyError(LOOKUP_MESSAGE.format(ALL_VERSIONS, ul.text))
     results = [('Ссылка на документацию', 'Версия', 'Статус')]
     for a_tag in a_tags:
         text_match = re.search(
@@ -106,7 +111,7 @@ def download(session):
     with open(archive_path, 'wb') as file:
         file.write(response.content)
     logging.info(
-        f'Архив был загружен и сохранён: {archive_path}'
+        SUCCSESS_DOWNLOAD_MESSAGE.format(archive_path)
     )
 
 
@@ -121,12 +126,12 @@ MODE_TO_FUNCTION = {
 def main():
     arg_parser = configure_argument_parser(MODE_TO_FUNCTION.keys())
     args = arg_parser.parse_args()
-    logging.info(f'Аргументы командной строки: {args}')
-    session = requests_cache.CachedSession()
-    if args.clear_cache:
-        session.cache.clear()
-    parser_mode = args.mode
+    logging.info(ARGS_MESSAGE.format(args))
     try:
+        session = requests_cache.CachedSession()
+        if args.clear_cache:
+            session.cache.clear()
+        parser_mode = args.mode
         control_output(MODE_TO_FUNCTION[parser_mode](session), args)
     except Exception as error:
         logging.exception(ERROR.format(error))
@@ -134,7 +139,6 @@ def main():
 
 if __name__ == '__main__':
     configure_logging()
-    logging.info('Парсер запущен!')
+    logging.info(START_MESSAGE)
     main()
-    logging.info('Парсер завершил работу.')
-    # whats_new(requests_cache.CachedSession())
+    logging.info(STOP_MESSAGE)

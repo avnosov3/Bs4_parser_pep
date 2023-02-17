@@ -15,19 +15,17 @@ DOWNLOADS = 'downloads'
 RESULTS = 'results'
 ALL_VERSIONS = 'All versions'
 
-EXPECTED_STATUSES = (
-    'Active',
-    'Accepted',
-    'Deferred',
-    'Final'
-    'Provisional',
-    'Rejected',
-    'Superseded',
-    'Withdrawn',
-    'Draft',
-    'Active',
+EXPECTED_STATUSES = dict(
+    Active=0,
+    Accepted=0,
+    Deferred=0,
+    Final=0,
+    Provisional=0,
+    Rejected=0,
+    Superseded=0,
+    Withdrawn=0,
+    Draft=0,
 )
-
 
 # я решал без этих констант,
 # но их пришлось вставить, чтобы пройти pytest
