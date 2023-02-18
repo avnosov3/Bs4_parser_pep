@@ -32,6 +32,5 @@ def get_soup(session, url, features='lxml'):
     return BeautifulSoup(get_response(session, url).text, features)
 
 
-def logger(logs, level=None):
-    return logging.exception(
-        *(log for log in logs)) if level is None else level
+def logger(logs, logging=logging.exception):
+    return (logging(log) for log in logs)
