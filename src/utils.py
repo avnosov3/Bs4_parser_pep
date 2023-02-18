@@ -32,7 +32,7 @@ def get_soup(session, url, features='lxml'):
     return BeautifulSoup(get_response(session, url).text, features)
 
 
-def logger(logs, logging=logging.exception):
+def logger(logs, logging=logging.warning):
     # logging(*logs)
     for log in logs:
         logging(log)

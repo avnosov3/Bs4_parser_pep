@@ -65,7 +65,7 @@ def whats_new(session):
         get_soup(
             session, whats_new_url
         ).select(
-                '#what-s-new-in-python div.toctree-wrapper li.toctree-l1'
+            '#what-s-new-in-python div.toctree-wrapper li.toctree-l1'
         )
     ):
         version_a_tag = section.find('a')
