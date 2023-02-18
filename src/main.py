@@ -9,7 +9,7 @@ from configs import configure_argument_parser, configure_logging
 from constants import (ALL_VERSIONS, BASE_DIR, DOWNLOADS, EXPECTED_STATUSES,
                        MAIN_DOC_URL, MAIN_PEP_URL)
 from outputs import control_output
-from utils import find_tag, get_soup, get_logs
+from utils import find_tag, get_soup, logger
 
 DIFFERENT_STATUSES_MESSAGE = (
     'Несовпадающие статусы "{}". '
@@ -25,27 +25,32 @@ ARGS_MESSAGE = 'Аргументы командной строки: {}.'
 START_MESSAGE = 'Парсер запущен!'
 STOP_MESSAGE = 'Парсер завершил работу.'
 
-LOGS = []
-
 
 def pep(session):
-    for row in tqdm(get_soup(session, MAIN_PEP_URL).select(
-                    '#numerical-index tbody tr')):
+    logs = []
+    for row in tqdm(
+        get_soup(
+            session, MAIN_PEP_URL
+        ).select(
+            '#numerical-index tbody tr'
+        )
+    ):
         _, table_status = row.find('abbr')['title'].split(',')
         table_status = table_status.strip()
         url = urljoin(MAIN_PEP_URL, row.find('a')['href'])
         try:
             status = get_soup(session, url).find('abbr').text
         except ConnectionError:
+            logs.append(NONE_MESSAGE.format(url))
             continue
         if table_status not in status:
-            LOGS.append(
+            logs.append(
                 DIFFERENT_STATUSES_MESSAGE.format(
                     url, table_status, status
                 )
             )
         EXPECTED_STATUSES[table_status] += 1
-    get_logs(LOGS)
+    logger(logs)
     return [
         ('Статус', 'Количество'),
         *EXPECTED_STATUSES.items(),
@@ -56,8 +61,13 @@ def pep(session):
 def whats_new(session):
     whats_new_url = urljoin(MAIN_DOC_URL, 'whatsnew/')
     results = [('Ссылка на статью', 'Заголовок', 'Редактор, Автор')]
-    for section in tqdm(get_soup(session, whats_new_url).select(
-                '#what-s-new-in-python div.toctree-wrapper li.toctree-l1')):
+    for section in tqdm(
+        get_soup(
+            session, whats_new_url
+        ).select(
+                '#what-s-new-in-python div.toctree-wrapper li.toctree-l1'
+        )
+    ):
         version_a_tag = section.find('a')
         href = version_a_tag['href']
         version_link = urljoin(whats_new_url, href)

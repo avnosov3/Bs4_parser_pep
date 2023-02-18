@@ -1,6 +1,7 @@
 import logging
 
 from bs4 import BeautifulSoup
+from requests import RequestException
 
 from exceptions import ParserFindTagException
 
@@ -14,7 +15,7 @@ def get_response(session, url, encoding='utf-8'):
         response = session.get(url)
         response.encoding = encoding
         return response
-    except ConnectionError:
+    except RequestException:
         raise ConnectionError(
             REQUEST_ERROR.format(url)
         )
@@ -31,5 +32,6 @@ def get_soup(session, url, features='lxml'):
     return BeautifulSoup(get_response(session, url).text, features)
 
 
-def get_logs(logs):
-    return [logging.exception(log) for log in logs]
+def logger(logs, level=None):
+    return logging.exception(
+        *(log for log in logs)) if level is None else level
