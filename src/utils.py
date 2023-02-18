@@ -33,5 +33,6 @@ def get_soup(session, url, features='lxml'):
 
 
 def logger(logs, logging=logging.exception):
-    for log in logs:
-        logging(log)
+    logging(*logs)
+    # for log in logs:
+    #     logging(log)
