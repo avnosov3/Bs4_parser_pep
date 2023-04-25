@@ -1,5 +1,5 @@
 # BS4 Parser PEP
-Содержит четыре парсера
+Содержит четыре парсера:
 1. **whats_new** собирает ссылки на статьи о нововведениях в Python    
 2. **latest_versions** cобирает информацию о статусах версий Python    
 3. **download** скачивает архив с актуальной документацией в папку **downloads/**    
@@ -37,7 +37,7 @@ pip install -r requirements.txt (Windows)
 cd src
 python main.py <НАЗВАНИЕ ПАРСЕРА>(whats_new, latest_versions, download, pep)
 ```
-6. Вывод информации в терминал
+6. Вывести информации в терминал
 ```
 python main.py <НАЗВАНИЕ ПАРСЕРА> --output pretty
 ```
