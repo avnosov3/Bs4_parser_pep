@@ -12,11 +12,11 @@
 ## Запуск проекта
 1. Клонировать репозиторий
 ```
-git clone git@github.com:avnosov3/bs4_parser_pep.git
+git clone git@github.com:avnosov3/Bs4_parser_pep.git
 ```
 2. Перейти в папку с проектом и создать виртуальное окружение
 ```
-cd bs4_parser_pep
+cd Bs4_parser_pep
 ```
 ```
 python3 -m venv env
