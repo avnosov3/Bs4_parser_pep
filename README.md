@@ -1,7 +1,7 @@
 # BS4 Parser PEP
 Содержит четыре парсера:
-1. **whats_new** собирает ссылки на статьи о нововведениях в Python    
-2. **latest_versions** cобирает информацию о статусах версий Python    
+1. **whats-new** собирает ссылки на статьи о нововведениях в Python    
+2. **latest-versions** cобирает информацию о статусах версий Python    
 3. **download** скачивает архив с актуальной документацией в папку **downloads/**    
 4. **pep** собирает информацию о количестве статусов PEP 
 
@@ -12,11 +12,11 @@
 ## Запуск проекта
 1. Клонировать репозиторий
 ```
-git clone git@github.com:avnosov3/Bs4_parser_pep.git
+git clone git@github.com:avnosov3/Parser_bs4_pep.git
 ```
 2. Перейти в папку с проектом и создать виртуальное окружение
 ```
-cd Bs4_parser_pep
+cd Parser_bs4_pep
 ```
 ```
 python3 -m venv env
@@ -35,7 +35,7 @@ pip install -r requirements.txt (Windows)
 5. Запустить парсер
 ```
 cd src
-python main.py <НАЗВАНИЕ ПАРСЕРА>(whats_new, latest_versions, download, pep)
+python main.py <НАЗВАНИЕ ПАРСЕРА>(whats-new, latest-versions, download, pep)
 ```
 6. Вывести информации в терминал
 ```
