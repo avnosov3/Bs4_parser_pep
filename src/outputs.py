@@ -27,6 +27,8 @@ def file_output(results, cli_args):
 
 
 def default_output(results, *cli_args):
+    if results is None:
+        return
     for row in results:
         print(*row)
 
