@@ -6,8 +6,10 @@ import requests_cache
 from tqdm import tqdm
 
 from configs import configure_argument_parser, configure_logging
-from constants import (ALL_VERSIONS, BASE_DIR, DOWNLOADS, EXPECTED_STATUSES,
-                       MAIN_DOC_URL, MAIN_PEP_URL)
+from constants import (
+    ALL_VERSIONS, BASE_DIR, DOWNLOADS, EXPECTED_STATUSES,
+    MAIN_DOC_URL, MAIN_PEP_URL
+)
 from outputs import control_output
 from utils import find_tag, get_soup, logger
 
